@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>SSE Example</title>
+    </head>
+    <body>
+        <h1>SSE Example</h1>
+        <script>
+            const source = new EventSource("/events");
+            source.onmessage = function (event) {
+                console.log("Got:" + event.data);
+            };
+        </script>
+    </body>
+</html>
