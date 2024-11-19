@@ -6,6 +6,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
     pub server: ServerConfig,
+    pub auth: AuthConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthConfig {
+    pub ek: String,
+    pub dk: String,
 }
 
 impl AppConfig {
@@ -29,10 +36,5 @@ impl AppConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServerConfig {
     pub port: u16,
-}
-
-impl ServerConfig {
-    pub fn new(port: u16) -> Self {
-        Self { port }
-    }
+    pub db_url: String,
 }

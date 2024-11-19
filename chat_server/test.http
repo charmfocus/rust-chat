@@ -1,3 +1,22 @@
 ### chat api
 
 GET http://localhost:6688/api/chat
+
+### signup
+POST http://localhost:6688/api/signup
+Content-Type: application/json
+
+{
+  "fullname": "wiki",
+  "email": "charmfocus@gmail.com",
+  "password": "123456"
+}
+
+### signin
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+  "email": "charmfocus@gmail.com",
+  "password": "1234565"
+}
