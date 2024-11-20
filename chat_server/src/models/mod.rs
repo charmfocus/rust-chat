@@ -1,3 +1,4 @@
+mod messages;
 mod user;
 
 use chrono::{DateTime, Utc};
@@ -30,4 +31,24 @@ impl User {
             created_at: Utc::now(),
         }
     }
+}
+
+/*
+CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    chat_id BIGINT NOT NULL REFERENCES chats(id),
+    sender_id BIGINT NOT NULL REFERENCES users(id),
+    content TEXT NOT NULL,
+    files TEXT[],
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+*/
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, PartialEq)]
+pub struct Message {
+    pub id: i64,
+    pub chat_id: i64,
+    pub sender_id: i64,
+    pub content: String,
+    pub files: Vec<String>,
+    pub created_at: DateTime<Utc>,
 }

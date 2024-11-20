@@ -28,6 +28,12 @@ pub enum AppError {
     #[error("email already exists: {0}")]
     EmailAlreadyExists(String),
 
+    #[error("create chat error: {0}")]
+    CreateChatError(String),
+
+    #[error("create message error: {0}")]
+    CreateMessageError(String),
+
     #[error("password hash error: {0}")]
     PasswordHashError(#[from] argon2::password_hash::Error),
 
@@ -43,9 +49,11 @@ impl IntoResponse for AppError {
         let status = match &self {
             AppError::SqlxError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::PasswordHashError(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            AppError::EmailAlreadyExists(_) => StatusCode::CONFLICT,
+            AppError::CreateChatError(_) => StatusCode::BAD_REQUEST,
+            AppError::CreateMessageError(_) => StatusCode::BAD_REQUEST,
             AppError::JwtError(_) => StatusCode::FORBIDDEN,
             AppError::HttpHeaderParseError(_) => StatusCode::UNPROCESSABLE_ENTITY,
-            AppError::EmailAlreadyExists(_) => StatusCode::CONFLICT,
         };
 
         (status, Json(ErrorOutput::new(self.to_string()))).into_response()

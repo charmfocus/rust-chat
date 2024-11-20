@@ -1,9 +1,7 @@
-### chat api
-
-GET http://localhost:6688/api/chat
+@base_url=http://localhost:6688
 
 ### signup
-POST http://localhost:6688/api/signup
+POST {{base_url}}/api/signup
 Content-Type: application/json
 
 {
@@ -12,11 +10,30 @@ Content-Type: application/json
   "password": "123456"
 }
 
+
 ### signin
-POST http://localhost:6688/api/signin
+# @name signin
+POST {{base_url}}/api/signin
 Content-Type: application/json
 
 {
   "email": "charmfocus@gmail.com",
-  "password": "1234565"
+  "password": "123456"
 }
+
+@token = {{signin.response.body.token}}
+
+### signin-err
+POST {{base_url}}/api/signin-err
+Content-Type: application/json
+
+{
+  "email": "charmfocus@gmail.com",
+  "password": "1234567"
+}
+
+
+### get chat list
+# @name chatlist
+GET {{base_url}}/api/chat
+Authorization: Bearer {{token}}
