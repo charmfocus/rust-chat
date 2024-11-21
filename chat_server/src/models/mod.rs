@@ -1,5 +1,6 @@
 mod messages;
 mod user;
+mod workspace;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -10,6 +11,7 @@ pub use user::{CreateUser, SigninUser};
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize, PartialEq)]
 pub struct User {
     pub id: i64,
+    pub workspace_id: i64,
     pub fullname: String,
     pub email: String,
 
@@ -20,17 +22,48 @@ pub struct User {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, PartialEq)]
+pub struct Workspace {
+    pub id: i64,
+    pub name: String,
+    pub owner_id: i64,
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, PartialEq)]
+pub struct ChatUser {
+    pub id: i64,
+    pub fullname: String,
+    pub email: String,
+    pub created_at: DateTime<Utc>,
+}
+
 #[cfg(test)]
 impl User {
-    pub fn new(id: i64, fullname: &str, email: &str) -> Self {
+    pub fn new(id: i64, workspace_id: i64, fullname: &str, email: &str) -> Self {
         Self {
             id,
+            workspace_id,
             fullname: fullname.to_string(),
             email: email.to_string(),
             password_hash: None,
             created_at: Utc::now(),
         }
     }
+}
+
+#[allow(unused)]
+impl ChatUser {
+    pub fn new(id: i64, fullname: &str, email: &str) -> Self {
+        Self {
+            id,
+            fullname: fullname.to_string(),
+            email: email.to_string(),
+            created_at: Utc::now(),
+        }
+    }
+
+    pub async fn fetch_all() {}
 }
 
 /*

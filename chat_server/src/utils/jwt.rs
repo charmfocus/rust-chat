@@ -61,7 +61,7 @@ mod tests {
         let ek = EncodingKey::load(ek_str)?;
         let dk = DecodingKey::load(dk_str)?;
 
-        let user = User::new(1, "wiki", "charmfocus@gmail.com");
+        let user = User::new(1, 0, "wiki", "charmfocus@gmail.com");
 
         let token = ek.sign(user.clone())?;
         let user2 = dk.verify(&token)?;

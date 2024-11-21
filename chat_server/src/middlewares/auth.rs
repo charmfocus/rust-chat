@@ -62,7 +62,7 @@ mod tests {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::new_for_test(config).await?;
 
-        let user = User::new(1, "wiki", "charmfocus@gmail.com");
+        let user = User::new(1, 0, "wiki", "charmfocus@gmail.com");
         let token = state.ek.sign(user)?;
 
         let app = Router::new()

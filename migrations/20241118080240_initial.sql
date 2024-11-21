@@ -4,9 +4,11 @@
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     fullname VARCHAR(64) NOT NULL UNIQUE,
+    email VARCHAR(64) NOT NULL UNIQUE,
     -- password is stored as a hash argon2
     password_hash VARCHAR(97) NOT NULL,
-    email VARCHAR(64) NOT NULL UNIQUE,
+    -- workspace name
+    workspace varchar(32) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

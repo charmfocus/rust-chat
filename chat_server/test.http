@@ -5,8 +5,9 @@ POST {{base_url}}/api/signup
 Content-Type: application/json
 
 {
-  "fullname": "wiki",
-  "email": "charmfocus@gmail.com",
+  "workspace": "g1",
+  "fullname": "wiki2",
+  "email": "wiki2@gmail.com",
   "password": "123456"
 }
 
@@ -36,4 +37,8 @@ Content-Type: application/json
 ### get chat list
 # @name chatlist
 GET {{base_url}}/api/chat
+Authorization: Bearer {{token}}
+
+### get user list
+GET {{base_url}}/api/users
 Authorization: Bearer {{token}}

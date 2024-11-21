@@ -55,7 +55,7 @@ mod tests {
         let config = AppConfig::load()?;
 
         let (_tdb, state) = AppState::new_for_test(config).await?;
-        let input = CreateUser::new("wiki", "charmfocus@gmail.com", "123456");
+        let input = CreateUser::new("wiki", "charmfocus@gmail.com", "default", "123456");
         let ret = signup_handler(State(state), Json(input))
             .await?
             .into_response();
@@ -75,9 +75,10 @@ mod tests {
         let (_tdb, state) = AppState::new_for_test(config).await?;
         let fullname = "wiki";
         let email = "charmfocus@gmail.com";
+        let workspace = "default";
         let password = "123456";
 
-        let input = CreateUser::new(fullname, email, password);
+        let input = CreateUser::new(fullname, email, workspace, password);
         signup_handler(State(state.clone()), Json(input.clone())).await?;
 
         let ret = signup_handler(State(state.clone()), Json(input.clone()))
@@ -98,10 +99,11 @@ mod tests {
 
         let name = "wiki";
         let email = "charmfocus@gmail.com";
+        let workspace = "default";
         let password = "123456";
 
         let (_tdb, state) = AppState::new_for_test(config).await?;
-        let user = CreateUser::new(name, email, password);
+        let user = CreateUser::new(name, email, workspace, password);
 
         User::create(&user, &state.pool).await?;
 
