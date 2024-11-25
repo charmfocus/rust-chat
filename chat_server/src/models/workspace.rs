@@ -73,7 +73,10 @@ impl Workspace {
     }
 
     #[allow(dead_code)]
-    pub async fn fetch_all_chat_users(id: u64, pool: &PgPool) -> Result<Vec<ChatUser>, AppError> {
+    pub async fn fetch_all_chat_users(
+        workspace_id: u64,
+        pool: &PgPool,
+    ) -> Result<Vec<ChatUser>, AppError> {
         let users = sqlx::query_as(
             r#"
                 SELECT id, fullname, email, created_at
@@ -82,7 +85,7 @@ impl Workspace {
                 ORDER BY id
                 "#,
         )
-        .bind(id as i64)
+        .bind(workspace_id as i64)
         .fetch_all(pool)
         .await?;
         Ok(users)
@@ -91,72 +94,44 @@ impl Workspace {
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
-    use crate::{models::CreateUser, User};
+    use crate::{models::CreateUser, test_util::get_test_pool, User};
 
     use super::*;
 
     use anyhow::Result;
-    use sqlx_db_tester::TestPg;
 
     #[tokio::test]
     async fn workespace_should_create_and_set_owner() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://postgres:123456@localhost".to_string(),
-            Path::new("../migrations"),
-        );
+        let (_tdb, pool) = get_test_pool(Some("postgres://postgres:123456@localhost")).await;
+        let ws = Workspace::create("test", 0, &pool).await?;
 
-        let pool = tdb.get_pool().await;
-        let input = CreateUser::new("wiki", "charmfocus@gmail.com", "default", "123456");
-        let user = User::create(&input, &pool).await?;
-        let ws = Workspace::create("test", user.id as u64, &pool).await?;
         assert_eq!(ws.name, "test");
 
-        let user = user.add_to_workspace(ws.id as u64, &pool).await?;
+        let input = CreateUser::new(&ws.name, "wiki2@gmail.com", &ws.name, "123456");
+        let user = User::create(&input, &pool).await?;
         assert_eq!(user.workspace_id, ws.id);
-        assert_eq!(ws.owner_id, user.id);
+
+        let ws = Workspace::find_by_id(ws.id as u64, &pool).await?;
+        assert_eq!(ws.unwrap().owner_id, user.id);
 
         Ok(())
     }
 
     #[tokio::test]
     async fn workspace_should_find_by_name() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://postgres:123456@localhost".to_string(),
-            Path::new("../migrations"),
-        );
+        let (_tdb, pool) = get_test_pool(Some("postgres://postgres:123456@localhost")).await;
+        let ws = Workspace::find_by_name("acme", &pool).await?;
 
-        let pool = tdb.get_pool().await;
-
-        Workspace::create("test", 0, &pool).await?;
-        let ws = Workspace::find_by_name("test", &pool).await?;
-
-        assert_eq!(ws.unwrap().name, "test");
+        assert_eq!(ws.unwrap().name, "acme");
         Ok(())
     }
 
     #[tokio::test]
     async fn workspace_should_fetch_all_chat_users() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://postgres:123456@localhost".to_string(),
-            Path::new("../migrations"),
-        );
+        let (_tdb, pool) = get_test_pool(Some("postgres://postgres:123456@localhost")).await;
 
-        let pool = tdb.get_pool().await;
-        let ws = Workspace::create("test", 0, &pool).await?;
-        assert_eq!(ws.name, "test");
-        let input = CreateUser::new("wiki", "charmfocus@gmail.com", &ws.name, "123456");
-        let user1 = User::create(&input, &pool).await?;
-        assert_eq!(user1.fullname, "wiki");
-
-        let input = CreateUser::new("wukun", "wukun@gmail.com", &ws.name, "123456");
-        let user2 = User::create(&input, &pool).await?;
-        assert_eq!(user2.fullname, "wukun");
-
-        let users = Workspace::fetch_all_chat_users(ws.id as u64, &pool).await?;
-        assert_eq!(users.len(), 2);
-        assert_eq!(users[0].id, user1.id);
+        let users = Workspace::fetch_all_chat_users(1, &pool).await?;
+        assert_eq!(users.len(), 4);
 
         Ok(())
     }

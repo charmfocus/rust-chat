@@ -18,10 +18,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_email ON users (email);
 
 -- create chat type: single group privete_channel public_channel
 CREATE TYPE chat_type AS ENUM ('single', 'group', 'private_channel', 'public_channel');
+
 -- create chat table
 CREATE TABLE IF NOT EXISTS chats (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(128) NOT NULL UNIQUE,
+    name VARCHAR(64),
     type chat_type NOT NULL,
     members BIGINT[] NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -30,8 +31,8 @@ CREATE TABLE IF NOT EXISTS chats (
 -- create message table
 CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
-    chat_id BIGINT NOT NULL REFERENCES chats(id),
-    sender_id BIGINT NOT NULL REFERENCES users(id),
+    chat_id BIGINT NOT NULL,
+    sender_id BIGINT NOT NULL,
     content TEXT NOT NULL,
     files TEXT[],
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

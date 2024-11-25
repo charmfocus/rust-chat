@@ -173,10 +173,10 @@ impl SigninUser {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use std::path::Path;
+
+    use crate::test_util::get_test_pool;
 
     use super::*;
-    use sqlx_db_tester::TestPg;
 
     #[test]
     fn hash_password_and_verify_should_work() -> Result<()> {
@@ -189,14 +189,8 @@ mod tests {
 
     #[tokio::test]
     async fn create_duplicate_user_should_fail() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://postgres:123456@localhost:5432".to_string(),
-            Path::new("../migrations"),
-        );
-
-        let pool = tdb.get_pool().await;
+        let (_tdb, pool) = get_test_pool(Some("postgres://postgres:123456@localhost:5432")).await;
         let input = CreateUser::new("wiki", "charmfocus@gmail.com", "default", "123456");
-        User::create(&input, &pool).await?;
         let ret = User::create(&input, &pool).await;
         assert!(ret.is_err());
         match ret {
@@ -211,13 +205,8 @@ mod tests {
 
     #[tokio::test]
     async fn create_and_verify_user_should_work() -> Result<()> {
-        let tdb = TestPg::new(
-            "postgres://postgres:123456@localhost:5432".to_string(),
-            Path::new("../migrations"),
-        );
-
-        let pool = tdb.get_pool().await;
-        let input = CreateUser::new("wiki", "charmfocus@gmail.com", "default", "123456");
+        let (_tdb, pool) = get_test_pool(Some("postgres://postgres:123456@localhost:5432")).await;
+        let input = CreateUser::new("wiki3", "wiki3@gmail.com", "default", "123456");
         let user = User::create(&input, &pool).await?;
         assert_eq!(user.email, input.email);
         assert_eq!(user.fullname, input.fullname);

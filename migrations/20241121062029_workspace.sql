@@ -11,5 +11,12 @@ CREATE INDEX IF NOT EXISTS idx_owner_id ON workspaces (owner_id);
 
 -- alter users table to add workspace_id
 ALTER TABLE users ADD COLUMN workspace_id BIGINT NOT NULL;
+
+-- alter chats table to add workspace_id
+ALTER TABLE chats ADD COLUMN workspace_id BIGINT NOT NULL;
+
 -- add index for users for workspace_id
 CREATE INDEX IF NOT EXISTS idx_workspace_id ON users (workspace_id);
+
+-- add index for chats for workspace_id
+CREATE INDEX IF NOT EXISTS idx_workspace_id ON chats (workspace_id);

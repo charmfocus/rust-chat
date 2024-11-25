@@ -1,3 +1,4 @@
+mod chat;
 mod messages;
 mod user;
 mod workspace;
@@ -35,6 +36,35 @@ pub struct ChatUser {
     pub id: i64,
     pub fullname: String,
     pub email: String,
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, PartialOrd, sqlx::Type)]
+#[sqlx(type_name = "chat_type", rename_all = "snake_case")]
+pub enum ChatType {
+    Single,
+    Group,
+    PrivateChannel,
+    PublicChannel,
+}
+
+/*
+-- create chat table
+CREATE TABLE IF NOT EXISTS chats (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(64),
+    type chat_type NOT NULL,
+    members BIGINT[] NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+*/
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize, PartialEq)]
+pub struct Chat {
+    pub id: i64,
+    pub workspace_id: i64,
+    pub name: Option<String>,
+    pub r#type: ChatType,
+    pub members: Vec<i64>,
     pub created_at: DateTime<Utc>,
 }
 
