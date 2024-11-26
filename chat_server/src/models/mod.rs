@@ -7,6 +7,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
+pub use chat::CreateChat;
 pub use user::{CreateUser, SigninUser};
 
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize, PartialEq)]
@@ -80,20 +81,6 @@ impl User {
             created_at: Utc::now(),
         }
     }
-}
-
-#[allow(unused)]
-impl ChatUser {
-    pub fn new(id: i64, fullname: &str, email: &str) -> Self {
-        Self {
-            id,
-            fullname: fullname.to_string(),
-            email: email.to_string(),
-            created_at: Utc::now(),
-        }
-    }
-
-    pub async fn fetch_all() {}
 }
 
 /*

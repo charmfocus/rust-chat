@@ -9,7 +9,7 @@ use sqlx::PgPool;
 
 use crate::{AppError, User};
 
-use super::Workspace;
+use super::{ChatUser, Workspace};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateUser {
@@ -125,6 +125,39 @@ impl User {
             }
         }
         Ok(None)
+    }
+}
+
+#[allow(dead_code)]
+impl ChatUser {
+    pub async fn fetch_by_ids(ids: &[i64], pool: &PgPool) -> Result<Vec<Self>, AppError> {
+        let users = sqlx::query_as(
+            r#"
+            SELECT id, fullname, email, created_at
+            FROM users
+            WHERE id = ANY($1)
+            "#,
+        )
+        .bind(ids)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(users)
+    }
+
+    pub async fn fetch_all(workspace_id: i64, pool: &PgPool) -> Result<Vec<Self>, AppError> {
+        let users = sqlx::query_as(
+            r#"
+            SELECT id, fullname, email, created_at
+            FROM users
+            WHERE workspace_id = $1
+            "#,
+        )
+        .bind(workspace_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(users)
     }
 }
 
