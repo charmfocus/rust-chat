@@ -34,6 +34,9 @@ pub enum AppError {
     #[error("Not found: {0}")]
     NotFound(String),
 
+    #[error("io error: {0}")]
+    IoError(#[from] std::io::Error),
+
     #[error("create message error: {0}")]
     CreateMessageError(String),
 
@@ -58,6 +61,7 @@ impl IntoResponse for AppError {
             AppError::JwtError(_) => StatusCode::FORBIDDEN,
             AppError::HttpHeaderParseError(_) => StatusCode::UNPROCESSABLE_ENTITY,
             AppError::NotFound(_) => StatusCode::NOT_FOUND,
+            AppError::IoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
         (status, Json(ErrorOutput::new(self.to_string()))).into_response()

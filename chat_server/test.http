@@ -63,3 +63,30 @@ Authorization: Bearer {{token}}
 ### get user list
 GET {{base_url}}/api/users
 Authorization: Bearer {{token}}
+
+
+### upload
+POST {{base_url}}/api/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="1.webp"
+Content-Type: image/webp
+
+< ./chat_server/assets/1.webp
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="2.jpeg"
+Content-Type: image/jpeg
+
+< ./chat_server/assets/2.jpeg
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="hello.txt"
+Content-Type: text/plain
+
+hello world
+--MyBoundary--
+
+### get files
+GET {{base_url}}/api/files/1/c13/504/f6f2e198b8751c5f6030e27bc626f27a6e.jpeg
+Authorization: Bearer {{token}}

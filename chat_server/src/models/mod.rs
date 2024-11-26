@@ -1,4 +1,5 @@
 mod chat;
+mod file;
 mod messages;
 mod user;
 mod workspace;
@@ -101,4 +102,10 @@ pub struct Message {
     pub content: String,
     pub files: Vec<String>,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ChatFile {
+    pub ext: String, // extract ext from filename or mime type
+    pub hash: String,
 }

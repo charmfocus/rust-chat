@@ -69,7 +69,7 @@ impl User {
             RETURNING id, workspace_id, fullname, email, created_at
             "#,
         )
-        .bind(ws.id as i64)
+        .bind(ws.id)
         .bind(&ws.name)
         .bind(&input.fullname)
         .bind(&input.email)
