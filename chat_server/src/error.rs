@@ -40,6 +40,9 @@ pub enum AppError {
     #[error("create message error: {0}")]
     CreateMessageError(String),
 
+    #[error("chat file error: {0}")]
+    ChatFileError(String),
+
     #[error("password hash error: {0}")]
     PasswordHashError(#[from] argon2::password_hash::Error),
 
@@ -62,6 +65,7 @@ impl IntoResponse for AppError {
             AppError::HttpHeaderParseError(_) => StatusCode::UNPROCESSABLE_ENTITY,
             AppError::NotFound(_) => StatusCode::NOT_FOUND,
             AppError::IoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::ChatFileError(_) => StatusCode::BAD_REQUEST,
         };
 
         (status, Json(ErrorOutput::new(self.to_string()))).into_response()

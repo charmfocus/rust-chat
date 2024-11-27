@@ -106,6 +106,7 @@ pub struct Message {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ChatFile {
+    pub workspace_id: u64,
     pub ext: String, // extract ext from filename or mime type
     pub hash: String,
 }
