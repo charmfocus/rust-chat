@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     models::{CreateUser, SigninUser},
-    AppError, AppState, ErrorOutput, User,
+    AppError, AppState, ErrorOutput,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,7 +15,7 @@ pub(crate) async fn signup_handler(
     State(state): State<AppState>,
     Json(input): Json<CreateUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user = User::create(&input, &state.pool).await?;
+    let user = state.create_user(&input).await?;
 
     let token = state.ek.sign(user)?;
     // let mut header = HeaderMap::new();
@@ -29,7 +29,7 @@ pub(crate) async fn signin_handler(
     State(state): State<AppState>,
     Json(input): Json<SigninUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user = User::verify(&input, &state.pool).await?;
+    let user = state.verify_user(&input).await?;
     match user {
         Some(user) => {
             let token = state.ek.sign(user)?;
@@ -44,17 +44,13 @@ pub(crate) async fn signin_handler(
 
 #[cfg(test)]
 mod tests {
-    use crate::AppConfig;
-
     use super::*;
     use anyhow::Result;
     use axum::body::to_bytes;
 
     #[tokio::test]
     async fn signup_should_work() -> Result<()> {
-        let config = AppConfig::load()?;
-
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
         let input = CreateUser::new("wiki4", "wiki4@gmail.com", "default", "123456");
         let ret = signup_handler(State(state), Json(input))
             .await?
@@ -70,9 +66,7 @@ mod tests {
 
     #[tokio::test]
     async fn signup_duplicate_user_should_409() -> Result<()> {
-        let config = AppConfig::load()?;
-
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
         let fullname = "wiki";
         let email = "charmfocus@gmail.com";
         let workspace = "acme";
@@ -94,12 +88,10 @@ mod tests {
 
     #[tokio::test]
     async fn signin_should_work() -> Result<()> {
-        let config = AppConfig::load()?;
-
         let email = "charmfocus@gmail.com";
         let password = "123456";
 
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
 
         let input = SigninUser::new(email, password);
         let ret = signin_handler(State(state), Json(input))
@@ -117,9 +109,7 @@ mod tests {
 
     #[tokio::test]
     async fn signin_with_non_exist_user_should_403() -> Result<()> {
-        let config = AppConfig::load()?;
-
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
 
         let input = SigninUser::new("non_exist_user@gmail.com", "123456");
         let ret = signin_handler(State(state), Json(input))

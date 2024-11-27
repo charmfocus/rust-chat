@@ -115,9 +115,8 @@ mod test_util {
     };
 
     impl AppState {
-        pub async fn new_for_test(
-            config: AppConfig,
-        ) -> Result<(sqlx_db_tester::TestPg, Self), AppError> {
+        pub async fn new_for_test() -> Result<(sqlx_db_tester::TestPg, Self), AppError> {
+            let config = AppConfig::load()?;
             let dk = DecodingKey::load(&config.auth.dk).context("load dk key")?;
             let ek = EncodingKey::load(&config.auth.ek).context("load ek key")?;
             let db_url = Url::parse(&config.server.db_url).context("parse db url")?;
