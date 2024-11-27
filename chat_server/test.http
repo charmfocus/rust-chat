@@ -29,7 +29,7 @@ POST {{base_url}}/api/signin
 Content-Type: application/json
 
 {
-  "email": "charmfocus@gmail.com",
+  "email": "wiki2@gmail.com",
   "password": "123456"
 }
 
@@ -57,7 +57,7 @@ Authorization: Bearer {{token}}
 
 ### get chat list
 # @name chatlist
-GET {{base_url}}/api/chat
+GET {{base_url}}/api/chats
 Authorization: Bearer {{token}}
 
 ### get user list
@@ -89,4 +89,40 @@ hello world
 
 ### get files
 GET {{base_url}}/api/files/1/c13/504/f6f2e198b8751c5f6030e27bc626f27a6e.jpeg
+Authorization: Bearer {{token}}
+
+### send a message
+POST {{base_url}}/api/chats/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "hello world",
+  "files": []
+}
+
+
+### send a message2
+POST {{base_url}}/api/chats/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "hello world2",
+  "files": []
+}
+
+### send a message3
+POST {{base_url}}/api/chats/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "hello world3",
+  "files": []
+}
+
+### get messages
+GET {{base_url}}/api/chats/1/messages?limit=2&last_id=3
+Content-Type: application/json
 Authorization: Bearer {{token}}

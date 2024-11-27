@@ -1,7 +1,7 @@
 server:
   port: 6688
   db_url: postgres://postgres:123456@127.0.0.1:5432/chat
-  base_dir: /www/rust/chat/upload
+  base_dir: /tmp/chat_server
 auth:
   ek: |
     -----BEGIN PRIVATE KEY-----
