@@ -34,11 +34,23 @@ impl AppState {
     //     }
     // }
 
+    #[allow(dead_code)]
     pub async fn find_user_by_email(&self, email: &str) -> Result<Option<User>, AppError> {
         let user = sqlx::query_as(
             "SELECT id, workspace_id, fullname, email, created_at FROM users WHERE email = $1",
         )
         .bind(email)
+        .fetch_optional(&self.pool)
+        .await?;
+        Ok(user)
+    }
+
+    #[allow(dead_code)]
+    pub async fn find_user_by_id(&self, id: u64) -> Result<Option<User>, AppError> {
+        let user = sqlx::query_as(
+            "SELECT id, workspace_id, fullname, email, created_at FROM users WHERE id = $1",
+        )
+        .bind(id as i64)
         .fetch_optional(&self.pool)
         .await?;
         Ok(user)
@@ -226,6 +238,17 @@ mod tests {
         let input = SigninUser::new(&input.email, &input.password);
         let user = state.verify_user(&input).await?;
         assert!(user.is_some());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn find_user_by_id_should_work() -> Result<()> {
+        let (_tdb, state) = AppState::new_for_test().await?;
+        let user = state.find_user_by_id(1).await?;
+        assert!(user.is_some());
+        let user = user.unwrap();
+        assert_eq!(user.id, 1);
 
         Ok(())
     }
