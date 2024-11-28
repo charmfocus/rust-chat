@@ -51,7 +51,6 @@ impl DecodingKey {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::User;
     use anyhow::Result;
 
     #[tokio::test]

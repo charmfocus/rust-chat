@@ -1,5 +1,5 @@
-use super::{ChatFile, Message};
-use crate::{AppError, AppState};
+use crate::{AppError, AppState, ChatFile};
+use chat_core::Message;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 

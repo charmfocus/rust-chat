@@ -3,15 +3,17 @@ mod error;
 mod handlers;
 mod middlewares;
 mod models;
-mod utils;
 
 use anyhow::Context;
+use chat_core::{
+    middlewares::{set_layer, verify_token, TokenVerify},
+    DecodingKey, EncodingKey,
+};
 use handlers::*;
-use middlewares::{set_layer, verify_chat, verify_token};
+use middlewares::verify_chat;
 use sqlx::PgPool;
 use std::{fmt, ops::Deref, sync::Arc};
 use tokio::fs;
-use utils::{DecodingKey, EncodingKey};
 
 use axum::{
     middleware::from_fn_with_state,
@@ -55,7 +57,7 @@ pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
         .nest("/chats", chat)
         .route("/upload", post(upload_handler))
         .route("/files/:workspace_id/*path", get(file_handler))
-        .layer(from_fn_with_state(state.clone(), verify_token))
+        .layer(from_fn_with_state(state.clone(), verify_token::<AppState>))
         // routes doesn't need token verification
         .route("/signin", post(signin_handler))
         .route("/signup", post(signup_handler));
@@ -72,6 +74,14 @@ impl Deref for AppState {
 
     fn deref(&self) -> &Self::Target {
         &self.inner
+    }
+}
+
+impl TokenVerify for AppState {
+    type Error = AppError;
+    fn verify(&self, token: &str) -> Result<chat_core::User, Self::Error> {
+        let user = self.dk.verify(token)?;
+        Ok(user)
     }
 }
 
@@ -113,10 +123,7 @@ mod test_util {
 
     use super::*;
 
-    use crate::{
-        utils::{DecodingKey, EncodingKey},
-        AppConfig, AppError, AppState, AppStateInner,
-    };
+    use crate::{AppConfig, AppError, AppState, AppStateInner};
 
     impl AppState {
         pub async fn new_for_test() -> Result<(sqlx_db_tester::TestPg, Self), AppError> {
@@ -151,21 +158,6 @@ mod test_util {
 
         let tdb = TestPg::new(url.to_string(), Path::new("../migrations"));
         let pool = tdb.get_pool().await;
-
-        let sql = include_str!("../fixtures/test.sql").split(';');
-
-        let ts = pool.begin().await.expect("begin transaction failed");
-        for s in sql {
-            if s.trim().is_empty() {
-                continue;
-            }
-
-            let _ = sqlx::query(s)
-                .execute(&pool)
-                .await
-                .expect("execute sql failed");
-        }
-        ts.commit().await.expect("commit transaction failed");
 
         (tdb, pool)
     }

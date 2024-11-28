@@ -1,9 +1,8 @@
 use anyhow::Result;
-use sqlx::PgPool;
 
 use crate::{AppError, AppState};
 
-use super::Workspace;
+use chat_core::Workspace;
 
 impl AppState {
     pub async fn create_workspace(&self, name: &str, user_id: u64) -> Result<Workspace, AppError> {
@@ -49,15 +48,12 @@ impl AppState {
         .await?;
         Ok(ws)
     }
-}
 
-impl Workspace {
-    pub async fn update_owner(
+    pub async fn update_workspace_owner(
         &self,
         id: u64,
         owner_id: u64,
-        pool: &PgPool,
-    ) -> Result<Self, AppError> {
+    ) -> Result<Workspace, AppError> {
         // update owner_id in two cases 1) owner_id = 0 2) owner's ws_id = id
         let ws = sqlx::query_as(
             r#"
@@ -69,7 +65,7 @@ impl Workspace {
         )
         .bind(id as i64)
         .bind(owner_id as i64)
-        .fetch_one(pool)
+        .fetch_one(&self.pool)
         .await?;
         Ok(ws)
     }
