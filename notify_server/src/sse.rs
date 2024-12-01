@@ -6,8 +6,9 @@ use axum::{
         sse::{Event, KeepAlive},
         Sse,
     },
+    Extension,
 };
-// use chat_core::User;
+use chat_core::User;
 use futures::Stream;
 use tokio::sync::broadcast;
 use tokio_stream::{wrappers::BroadcastStream, StreamExt};
@@ -18,11 +19,10 @@ use crate::{AppEvent, AppState};
 const CHANNEL_CAPACITY: usize = 256;
 
 pub(crate) async fn sse_handler(
-    // Extension(user): Extension<User>,
+    Extension(user): Extension<User>,
     State(state): State<AppState>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    // let user_id = user.id as u64;
-    let user_id = 1;
+    let user_id = user.id as u64;
     let users = &state.users;
 
     let rx = if let Some(tx) = users.get(&user_id) {
@@ -51,10 +51,4 @@ pub(crate) async fn sse_handler(
             .interval(Duration::from_secs(1))
             .text("keep-alive-text"),
     )
-
-    // let stream = stream::repeat_with(|| Event::default().data("hi!"))
-    //     .map(Ok)
-    //     .throttle(Duration::from_secs(1));
-
-    // Sse::new(stream)
 }

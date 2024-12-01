@@ -7,7 +7,7 @@
 <body>
     <h1>SSE Example</h1>
     <script>
-        let token = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzMwMjk5ODQsImV4cCI6MTczMzYzNDc4NCwibmJmIjoxNzMzMDI5OTg0LCJpc3MiOiJjaGF0X3NlcnZlciIsImF1ZCI6ImNoYXRfd2ViIiwiaWQiOjEsIndvcmtzcGFjZV9pZCI6MSwiZnVsbG5hbWUiOiJ3aWtpIiwiZW1haWwiOiJjaGFybWZvY3VzQGdtYWlsLmNvbSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTAxVDA0OjM2OjQ2LjcwNjQ5MVoifQ.GTEO3U2vXY0qwcr5jLA9DBo6-ANyzc49GfTmvGiTUO95kvD_3y-x397bP0_Nnq4AsZk90VOFEro9_BK_fWkZDQ';
+        let token = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzMwMzIyMzAsImV4cCI6MTczMzYzNzAzMCwibmJmIjoxNzMzMDMyMjMwLCJpc3MiOiJjaGF0X3NlcnZlciIsImF1ZCI6ImNoYXRfd2ViIiwiaWQiOjEsIndvcmtzcGFjZV9pZCI6MSwiZnVsbG5hbWUiOiJ3aWtpIiwiZW1haWwiOiJjaGFybWZvY3VzQGdtYWlsLmNvbSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTAxVDA0OjM2OjQ2LjcwNjQ5MVoifQ.0c1PWZn2NktYmJJKDX-aPU_EisyBPdRSTDvH_mwbXYShR-UzYmrsTvs03urXwIP5JjAVfDw6CEPVqBUgeOf5BQ';
         const source = new EventSource(`/events?token=${token}`);
         source.onmessage = function (event) {
             console.log("Got:" + event.data);
