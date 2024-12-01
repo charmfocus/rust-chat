@@ -91,7 +91,7 @@ impl AppState {
             .await
             .context("create base_dir failed")?;
         let ek = EncodingKey::load(&config.auth.ek).context("load ek key")?;
-        let dk = DecodingKey::load(&config.auth.dk).context("load dk key")?;
+        let dk = DecodingKey::load(&config.auth.pk).context("load dk key")?;
         let pool = PgPool::connect(&config.server.db_url)
             .await
             .context("connect db")?;
@@ -128,7 +128,7 @@ mod test_util {
     impl AppState {
         pub async fn new_for_test() -> Result<(sqlx_db_tester::TestPg, Self), AppError> {
             let config = AppConfig::load()?;
-            let dk = DecodingKey::load(&config.auth.dk).context("load dk key")?;
+            let dk = DecodingKey::load(&config.auth.pk).context("load dk key")?;
             let ek = EncodingKey::load(&config.auth.ek).context("load ek key")?;
             let db_url = Url::parse(&config.server.db_url).context("parse db url")?;
             let server_base_rul = format!(

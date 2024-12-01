@@ -1,22 +1,60 @@
 use std::{convert::Infallible, time::Duration};
 
-use axum::response::{sse::Event, Sse};
-use axum_extra::{headers, TypedHeader};
-use futures::{stream, Stream};
-use tokio_stream::StreamExt;
+use axum::{
+    extract::State,
+    response::{
+        sse::{Event, KeepAlive},
+        Sse,
+    },
+};
+// use chat_core::User;
+use futures::Stream;
+use tokio::sync::broadcast;
+use tokio_stream::{wrappers::BroadcastStream, StreamExt};
+use tracing::debug;
+
+use crate::{AppEvent, AppState};
+
+const CHANNEL_CAPACITY: usize = 256;
 
 pub(crate) async fn sse_handler(
-    TypedHeader(user_agent): TypedHeader<headers::UserAgent>,
+    // Extension(user): Extension<User>,
+    State(state): State<AppState>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    println!("`{}` connected", user_agent.as_str());
+    // let user_id = user.id as u64;
+    let user_id = 1;
+    let users = &state.users;
 
-    // A `Stream` that repeats an event every second.
-    //
-    // You can also
-    // https://docs.rs/tokio-stream
-    let stream = stream::repeat_with(|| Event::default().data("hi!"))
-        .map(Ok)
-        .throttle(Duration::from_secs(1));
+    let rx = if let Some(tx) = users.get(&user_id) {
+        tx.subscribe()
+    } else {
+        let (tx, rx) = broadcast::channel(CHANNEL_CAPACITY);
+        state.users.insert(user_id, tx);
+        rx
+    };
 
-    Sse::new(stream)
+    let stream = BroadcastStream::new(rx).filter_map(|v| v.ok()).map(|v| {
+        let name = match v.as_ref() {
+            AppEvent::NewChat(_) => "NewChat",
+            AppEvent::AddToChat(_) => "AddToChat",
+            AppEvent::RemoveFromChat(_) => "RemoveFromChat",
+            AppEvent::NewMessage(_) => "NewMessage",
+        };
+
+        let v = serde_json::to_string(&v).expect("Failed to serialize event");
+        debug!("Sending event {}: {:?}", name, v);
+        Ok(Event::default().data(v).event(name))
+    });
+
+    Sse::new(stream).keep_alive(
+        KeepAlive::new()
+            .interval(Duration::from_secs(1))
+            .text("keep-alive-text"),
+    )
+
+    // let stream = stream::repeat_with(|| Event::default().data("hi!"))
+    //     .map(Ok)
+    //     .throttle(Duration::from_secs(1));
+
+    // Sse::new(stream)
 }

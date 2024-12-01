@@ -1,14 +1,34 @@
 <html>
-    <head>
-        <title>SSE Example</title>
-    </head>
-    <body>
-        <h1>SSE Example</h1>
-        <script>
-            const source = new EventSource("/events");
-            source.onmessage = function (event) {
-                console.log("Got:" + event.data);
-            };
-        </script>
-    </body>
+
+<head>
+    <title>SSE Example</title>
+</head>
+
+<body>
+    <h1>SSE Example</h1>
+    <script>
+        let token = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzMwMjk5ODQsImV4cCI6MTczMzYzNDc4NCwibmJmIjoxNzMzMDI5OTg0LCJpc3MiOiJjaGF0X3NlcnZlciIsImF1ZCI6ImNoYXRfd2ViIiwiaWQiOjEsIndvcmtzcGFjZV9pZCI6MSwiZnVsbG5hbWUiOiJ3aWtpIiwiZW1haWwiOiJjaGFybWZvY3VzQGdtYWlsLmNvbSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTAxVDA0OjM2OjQ2LjcwNjQ5MVoifQ.GTEO3U2vXY0qwcr5jLA9DBo6-ANyzc49GfTmvGiTUO95kvD_3y-x397bP0_Nnq4AsZk90VOFEro9_BK_fWkZDQ';
+        const source = new EventSource(`/events?token=${token}`);
+        source.onmessage = function (event) {
+            console.log("Got:" + event.data);
+        };
+
+        source.addEventListener("NewChat", function (event) {
+            console.log("NewChat:", event.data);
+        });
+
+        source.addEventListener("AddToChat", function (event) {
+            console.log("AddToChat:", event.data);
+        });
+
+        source.addEventListener("RemoveFromChat", function (event) {
+            console.log("RemoveFromChat:", event.data);
+        });
+
+        source.addEventListener("NewMessage", function (event) {
+            console.log("NewMessage:", event.data);
+        });
+    </script>
+</body>
+
 </html>

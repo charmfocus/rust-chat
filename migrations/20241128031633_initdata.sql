@@ -25,11 +25,11 @@ INSERT INTO messages (chat_id, sender_id, content)
 VALUES
     (1, 1, 'Hi, there!'),
     (1, 2, 'How are you?'),
-    (1, 3, 'I am fine, thank you!'),
-    (1, 4, 'Good to hear that!'),
-    (1, 5, 'Hello world!'),
-    (1, 6, 'Hi, there!'),
-    (1, 7, 'How are you?'),
-    (1, 8, 'I''m fine! 3q!'),
-    (1, 9, 'Good'),
-    (1, 10, 'What''s your name?');
+    (1, 1, 'I am fine, thank you!'),
+    (1, 2, 'Good to hear that!'),
+    (1, 1, 'Hello world!'),
+    (1, 2, 'Hi, there!'),
+    (1, 1, 'How are you?'),
+    (1, 2, 'I''m fine! 3q!'),
+    (1, 1, 'Good'),
+    (1, 2, 'What is your name?');

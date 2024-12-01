@@ -29,7 +29,7 @@ POST {{base_url}}/api/signin
 Content-Type: application/json
 
 {
-  "email": "wiki2@gmail.com",
+  "email": "charmfocus@gmail.com",
   "password": "123456"
 }
 
